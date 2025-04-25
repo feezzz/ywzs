@@ -29,7 +29,6 @@ public class DataInitializer {
                 adminUser.setEmail("admin@example.com");
                 adminUser.setPhone("13800000000");
                 adminUser.setStatus(1);
-                adminUser.setRemark("系统自动创建的管理员账号");
                 userService.saveUser(adminUser);
                 logger.info("默认管理员用户创建成功");
             }

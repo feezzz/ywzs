@@ -128,7 +128,7 @@ export default defineComponent({
     })
 
     // 用户信息
-    const userInfo = computed(() => userStore.userInfo)
+    const userInfo = computed(() => userStore.user)
 
     // 侧边栏折叠状态
     const isCollapsed = computed(() => appStore.sidebarCollapsed)

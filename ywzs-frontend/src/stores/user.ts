@@ -1,60 +1,57 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import request from '@/utils/request'
 
-interface LoginForm {
-  username: string
-  password: string
+interface UserState {
+  user: any | null
+  isAuthenticated: boolean
 }
 
-interface UserInfo {
-  id?: number
-  username?: string
-  fullName?: string
-  email?: string
-  phone?: string
-}
+export const useUserStore = defineStore('user', {
+  state: (): UserState => ({
+    user: null,
+    isAuthenticated: false
+  }),
 
-export const useUserStore = defineStore('user', () => {
-  const token = ref('')
-  const userInfo = ref<UserInfo>({})
+  actions: {
+    setUser(user: any) {
+      this.user = user
+      this.isAuthenticated = true
+    },
 
-  async function login(loginForm: LoginForm) {
-    try {
-      const response = await request.post('/auth/login', loginForm)
-      const { token: newToken, userInfo: user } = response.data.data
-      token.value = newToken
-      userInfo.value = user
-    } catch (error) {
-      clearUser()
-      throw error
+    clearUser() {
+      this.user = null
+      this.isAuthenticated = false
+    },
+
+    async checkAuth() {
+      try {
+        const response = await fetch('/api/auth/current-user', {
+          credentials: 'include'
+        })
+        if (response.ok) {
+          const user = await response.json()
+          this.setUser(user)
+          return true
+        } else {
+          this.clearUser()
+          return false
+        }
+      } catch (error) {
+        console.error('检查认证状态失败：', error)
+        this.clearUser()
+        return false
+      }
+    },
+
+    async logout() {
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'include'
+        })
+        this.clearUser()
+      } catch (error) {
+        console.error('退出登录失败：', error)
+      }
     }
-  }
-
-  function setToken(value: string) {
-    token.value = value
-  }
-
-  function setUserInfo(info: UserInfo) {
-    userInfo.value = info
-  }
-
-  function clearUser() {
-    token.value = ''
-    userInfo.value = {}
-  }
-
-  function logout() {
-    clearUser()
-  }
-
-  return {
-    token,
-    userInfo,
-    login,
-    setToken,
-    setUserInfo,
-    clearUser,
-    logout
   }
 }) 

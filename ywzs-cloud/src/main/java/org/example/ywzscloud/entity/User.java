@@ -25,7 +25,7 @@ public class User {
     @Column(nullable = false)
     private String password;
     
-    @Column(name = "name", nullable = false)
+    @Column(name = "full_name")
     private String fullName;
     
     @Column
@@ -37,20 +37,14 @@ public class User {
     @Column(nullable = false)
     private Integer status = 1;  // 0-禁用, 1-启用
     
-    @Column(name = "dept_id")
-    private Long deptId;
+    @Column(name = "created_time", updatable = false)
+    private LocalDateTime createdTime;
     
-    @Column(name = "create_time", updatable = false)
-    private LocalDateTime createdAt;
-    
-    @Column(name = "update_time")
-    private LocalDateTime updatedAt;
+    @Column(name = "updated_time")
+    private LocalDateTime updatedTime;
     
     @Column(name = "last_login_time")
     private LocalDateTime lastLoginTime;
-    
-    @Column
-    private String remark;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -62,8 +56,8 @@ public class User {
     
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+        createdTime = LocalDateTime.now();
+        updatedTime = LocalDateTime.now();
         if (status == null) {
             status = 1;
         }
@@ -71,6 +65,6 @@ public class User {
     
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedTime = LocalDateTime.now();
     }
 } 

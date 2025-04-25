@@ -24,28 +24,29 @@ public class Role {
     @Column(nullable = false, unique = true)
     private String code;
 
+    @Column
+    private String description;
+
     @Column(nullable = false)
     private Integer status = 1;  // 0-禁用, 1-启用
 
-    @Column(name = "create_time", updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "created_time", updatable = false)
+    private LocalDateTime createdTime;
 
-    @Column(name = "update_time")
-    private LocalDateTime updatedAt;
-
-    private String remark;
+    @Column(name = "updated_time")
+    private LocalDateTime updatedTime;
 
     @ManyToMany(mappedBy = "roles")
     private Set<User> users = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+        createdTime = LocalDateTime.now();
+        updatedTime = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedTime = LocalDateTime.now();
     }
 } 

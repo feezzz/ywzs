@@ -18,39 +18,35 @@ public class GlobalExceptionHandler {
     
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    private ResponseEntity<?> createErrorResponse(HttpStatus status, String error, String message) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", false);
+        response.put("error", error);
+        response.put("message", message);
+        return ResponseEntity.status(status).body(response);
+    }
+
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<?> handleAuthenticationException(AuthenticationException e) {
         logger.error("认证失败: {}", e.getMessage());
-        Map<String, String> response = new HashMap<>();
-        response.put("error", "认证失败");
-        response.put("message", e.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        return createErrorResponse(HttpStatus.UNAUTHORIZED, "认证失败", e.getMessage());
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException e) {
         logger.error("用户名或密码错误: {}", e.getMessage());
-        Map<String, String> response = new HashMap<>();
-        response.put("error", "用户名或密码错误");
-        response.put("message", e.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        return createErrorResponse(HttpStatus.UNAUTHORIZED, "用户名或密码错误", "用户名或密码不正确");
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e) {
         logger.error("访问被拒绝: {}", e.getMessage());
-        Map<String, String> response = new HashMap<>();
-        response.put("error", "访问被拒绝");
-        response.put("message", e.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        return createErrorResponse(HttpStatus.FORBIDDEN, "访问被拒绝", e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e) {
         logger.error("系统错误: {}", e.getMessage());
-        Map<String, String> response = new HashMap<>();
-        response.put("error", "系统错误");
-        response.put("message", e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "系统错误", e.getMessage());
     }
 } 

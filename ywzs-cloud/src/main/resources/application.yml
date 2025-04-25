@@ -21,7 +21,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
@@ -29,13 +29,24 @@ spring:
         use_sql_comments: true
     open-in-view: false
   main:
-    allow-circular-references: false
+    allow-circular-references: true
     allow-bean-definition-overriding: false
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
     serialization:
       write-dates-as-timestamps: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+      continue-on-error: false
+      separator: ;
 
 server:
   port: 8080
@@ -62,7 +73,7 @@ logging:
   level:
     root: INFO
     org.springframework.web: INFO
-    org.springframework.security: INFO
+    org.springframework.security: DEBUG
     org.springframework.security.oauth2: INFO
     org.springframework.boot.autoconfigure: WARN
     org.hibernate: INFO

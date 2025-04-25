@@ -73,8 +73,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
+        user.setCreatedTime(LocalDateTime.now());
+        user.setUpdatedTime(LocalDateTime.now());
         if (user.getStatus() == null) {
             user.setStatus(1);
         }
@@ -84,7 +84,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User updateUser(User user) {
-        user.setUpdatedAt(LocalDateTime.now());
+        if (user.getPassword() != null && !user.getPassword().trim().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        user.setUpdatedTime(LocalDateTime.now());
         return userRepository.save(user);
     }
 
@@ -97,5 +100,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
+    }
+
+    /**
+     * 检查并修复未加密的密码
+     * @param user 用户对象
+     * @return 如果密码被修复则返回true
+     */
+    private boolean checkAndFixPassword(User user) {
+        String password = user.getPassword();
+        if (password == null || password.isEmpty()) {
+            return false;
+        }
+        
+        // 尝试判断密码是否已加密（这是一个简单的判断，可能需要根据实际情况调整）
+        if (!password.startsWith("$2a$")) {
+            user.setPassword(passwordEncoder.encode(password));
+            userRepository.save(user);
+            return true;
+        }
+        return false;
     }
 } 

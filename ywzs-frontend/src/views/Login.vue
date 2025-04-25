@@ -64,18 +64,51 @@ export default defineComponent({
         if (valid) {
           loading.value = true
           try {
-            console.log('开始登录请求，表单数据：', loginForm)
-            await userStore.login(loginForm)
-            const redirect = route.query.redirect?.toString() || '/'
-            router.push(redirect)
-            ElMessage.success('登录成功')
-          } catch (error: any) {
-            console.error('登录失败：', {
-              message: error.message,
-              response: error.response?.data,
-              status: error.response?.status
+            const requestData = {
+              username: loginForm.username,
+              password: loginForm.password  // 密码应该是明文
+            }
+            console.log('登录请求数据：', {
+              username: requestData.username,
+              password: '******'  // 日志中隐藏实际密码
             })
-            ElMessage.error(error.response?.data?.message || error.message || '登录失败')
+            
+            const response = await fetch('/api/auth/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(requestData),
+              credentials: 'include'  // 重要：包含 cookies
+            })
+
+            let data
+            try {
+              data = await response.json()
+              console.log('登录响应数据：', data)
+            } catch (e) {
+              console.error('解析响应数据失败：', e)
+              throw new Error('服务器响应格式错误')
+            }
+
+            if (!response.ok || !data.success) {
+              throw new Error(data.message || '登录失败')
+            }
+
+            if (data.data?.user) {
+              // 保存用户信息到 store
+              userStore.setUser(data.data.user)
+              const redirect = route.query.redirect?.toString() || '/'
+              await router.push(redirect)
+              ElMessage.success('登录成功')
+            } else {
+              console.error('登录响应数据格式不正确：', data)
+              throw new Error('登录响应数据格式错误')
+            }
+          } catch (error: any) {
+            console.error('登录失败：', error)
+            ElMessage.error(error.message || '登录失败')
+            userStore.clearUser()
           } finally {
             loading.value = false
           }
