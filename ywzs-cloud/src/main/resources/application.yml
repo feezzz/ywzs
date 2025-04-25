@@ -1,0 +1,77 @@
+debug: false
+
+spring:
+  output:
+    ansi:
+      enabled: ALWAYS
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ywzs_db?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: admin123
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 300000
+      pool-name: YwzsHikariCP
+      max-lifetime: 1200000
+      connection-timeout: 20000
+      connection-test-query: SELECT 1
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+    open-in-view: false
+  main:
+    allow-circular-references: false
+    allow-bean-definition-overriding: false
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+  tomcat:
+    max-threads: 200
+    min-spare-threads: 10
+    max-connections: 10000
+    connection-timeout: 5000
+
+app:
+  jwt:
+    # JWT加密密钥
+    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    # Token过期时间（毫秒）
+    expiration: 86400000  # 24小时
+    # Token前缀
+    prefix: "Bearer "
+    # Header名称
+    header: "Authorization"
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.springframework.security.oauth2: INFO
+    org.springframework.boot.autoconfigure: WARN
+    org.hibernate: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.example.ywzscloud: DEBUG
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
+  file:
+    name: logs/ywzs-cloud.log
+    max-size: 10MB
+    max-history: 30 
